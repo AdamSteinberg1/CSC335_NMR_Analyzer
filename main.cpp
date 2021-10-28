@@ -19,8 +19,3 @@ int main()
   outputResult(peaks, config, shift, runtime.count());
   return 0;
 }
-
-//TODO remove writeGnuPlotScript
-//remove writeData
-//remove gnuPrint and << from CubicSpline.cpp
-//remove unnecessary includes from CubicSpline.h
