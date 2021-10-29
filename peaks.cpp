@@ -8,6 +8,7 @@
 #include <gsl/gsl_poly.h>
 
 #define MAX_ITERATIONS 10000
+#define MAX_RECURSION_DEPTH 30
 
 //finds all the x values on the interval (a,b] where p(x) = 0
 //p is assumed to be a cubic polynomial
@@ -98,69 +99,42 @@ double romberg(std::function<double(double)> f, double a, double b, double toler
   return currRow.back();
 }
 
-//integrates from a to b until error is less than tolerance
-//performs adaptive quadrature with simpson's rule
-//this version is slower, but simpler
-//because it recalculates values that are used multiple times
-double adaptiveQuadSlow(std::function<double(double)> f, double a, double b, double tolerance)
-{
-  //integrates f from x0 to x1 using simpson's rule
-  std::function<double(double, double)> simpson = [&](double x0, double x1){
-    double h = (x1-x0)/2;
-    return (h/3)*(f(x0) + 4*f(x0+h) +f(x1));
-  };
+//recursively find the integral from a to b with simpson's method
+//tolerance is halved at each recursive level
+double adaptiveQuadHelper(std::function<double(double)> f, double a, double b, double tol, double whole, double f_a, double f_b, double f_mid, int recDepth) {
+    double mid = (a + b)/2;
+    double h = (b - a)/2;
+    double left_mid  = (a + mid)/2;
+    double right_mid  = (mid + b)/2;
+    //check for signs it's not going to converge
+    //if tolerance cannot be halved anymore
+    //or if the average of a and m equals a => a and m are too close together
+    if ((tol/2 == tol) || (a == left_mid))
+      return whole;
+    double f_left_mid = f(left_mid);
+    double f_right_mid = f(right_mid);
+    double left  = (h/6) * (f_a + 4*f_left_mid + f_mid);
+    double right = (h/6) * (f_mid + 4*f_right_mid + f_b);
+    double diff = whole - left - right;
 
-  double mid = (a+b)/2;
-  double whole = simpson(a, b);
-  double left = simpson(a, mid);
-  double right = simpson(mid, b);
-  double diff = left+right-whole;
-  if(fabs(diff) < 10*tolerance) //10*tolerance is used because that's what is used in the Burden text
-    return left + right;
-
-  return adaptiveQuadSlow(f, a, mid, tolerance/2) + adaptiveQuadSlow(f, mid, b, tolerance/2);
+    if (recDepth <= 0 || fabs(diff) <= 10*tol) //10*tolerance is used because that's what is used in the Burden text
+        return left + right;
+    return adaptiveQuadHelper(f, a, mid, tol/2, left,  f_a, f_mid, f_left_mid, recDepth-1) +
+           adaptiveQuadHelper(f, mid, b, tol/2, right, f_mid, f_b, f_right_mid, recDepth-1);
 }
-
 
 //integrates from a to b until error is less than tolerance
 //performs adaptive quadrature with simpson's rule
 double adaptiveQuad(std::function<double(double)> f, double a, double b, double tolerance)
 {
-  //integrates f from x0 to x1 using simpson's rule
-  //f_x0 is f evaluated at x0
-  //f_x1 is f  evaluated at x1
-  auto simpson = [&](double x0, double x1, double f_x0, double f_x1){
-    double mid = (x0 + x1)/2;
-    double f_mid = f(mid);
-    double result =  (fabs(x1-x0)/6)*(f_x0 + 4*f_mid + f_x1);
-    return std::make_tuple(mid, f_mid, result);
-  };
-
-  //performs adaptive quadrature recursively
-  //function evaluations and intermediate integrals are passed through arguments to avoid recalcuating values
-  std::function<double (double, double, double, double, double, double, double, double, int)> helper =
-  [&](double x0, double x1, double f_x0, double f_x1, double tol, double whole, double mid, double f_mid, int currDepth){
-    std::cout << "S(" << x0 << "," << x1 <<") tol = " << tol << " depth = " << currDepth << std::endl;
-    if(currDepth > MAX_ITERATIONS)
-    {
-      std::cout << "Adaptive quadrature failed to reach tolerance within " << MAX_ITERATIONS << " iterations. Using best approximation obtained." << std::endl;
-      return whole;
-    }
-    double left_mid, f_left_mid, left, right_mid, f_right_mid, right;
-    std::tie(left_mid, f_left_mid, left) = simpson(x0, mid, f_x0, f_mid);
-    std::tie(right_mid, f_right_mid, right) = simpson(mid, x1, f_mid, f_x1);
-    double diff = left + right - whole;
-    if (fabs(diff) < 10*tol)
-      return left + right;
-    return helper(x0, mid, f_x0, f_mid, tol/2, left, left_mid, f_left_mid, currDepth+1)
-         + helper(mid, x1, f_mid, f_x1, tol/2, right, right_mid, f_right_mid, currDepth+1);
-  };
-  std::cout.precision(15);
-  double f_a = f(a);
-  double f_b = f(b);
-  double mid, f_mid, whole;
-  std::tie(mid, f_mid, whole) = simpson(a, b, f_a, f_b);
-  return helper(a, b, f_a, f_b, tolerance, whole, mid, f_mid, 1);
+    if(a==b)
+      return 0.0;
+    double h = b - a;
+    double f_a = f(a);
+    double f_b = f(b);
+    double f_m = f((a + b)/2);
+    double simpsons = (h/6)*(f_a + 4*f_m + f_b);
+    return adaptiveQuadHelper(f, a, b, tolerance, simpsons, f_a, f_b, f_m, MAX_RECURSION_DEPTH);
 }
 
 //integrates f from a to b using Gaussian Quadrature with n=512

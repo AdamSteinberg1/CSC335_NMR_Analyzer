@@ -27,4 +27,6 @@ class CubicSpline
     std::pair<double, double> getRange(int i) const;
     //evaluate the cubic spline at x
     double evaluate(double x) const;
+
+    friend std::string gnuPrint(CubicSpline c);
 };

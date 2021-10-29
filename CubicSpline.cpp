@@ -72,17 +72,6 @@ Polynomial CubicSpline::operator[](int i) const
 //get the range of x values that the ith cubic is valid over
 std::pair<double, double> CubicSpline:: getRange(int i) const
 {
-  double inf = std::numeric_limits<double>::infinity();
-  if(i == 0)
-  {
-    return {-inf, xValues[1]};
-  }
-  int lastIndex = cubics.size();
-  if(i==lastIndex)
-  {
-    return {xValues[lastIndex-1], inf};
-  }
-
   return {xValues[i], xValues[i+1]};
 }
 

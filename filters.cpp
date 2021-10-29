@@ -15,9 +15,9 @@ std::vector<std::pair<double, double>> boxcarFilter(std::vector<std::pair<double
     double sum = 0;
     for(int j = startIndex; j <= endIndex; j++)
     {
-      sum += data[(j+n)%n].second/filterSize;
+      sum += data[(j+n)%n].second;
     }
-    result.push_back({data[i].first, sum});
+    result.push_back({data[i].first, sum/filterSize});
   }
   return result;
 }

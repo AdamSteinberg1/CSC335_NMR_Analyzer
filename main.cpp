@@ -17,5 +17,8 @@ int main()
   std::chrono::duration<double> runtime = endTime - startTime;
 
   outputResult(peaks, config, shift, runtime.count());
+
+  graph(spline, data);
+
   return 0;
 }

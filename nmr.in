@@ -1,8 +1,8 @@
 testdata.dat  # Name of NRM input file
-1400.0        # Baseline adjustment
-1e-11         # Tolerance for numerical algorithms
+1650.0        # Baseline adjustment
+1e-9          # Tolerance for numerical algorithms
 1             # Type of Filter (0=none, 1=boxcar, 2=SG)
-5             # Size of boxcar or SG filter (should be odd)
-5             # Number of passes for the filter (ignored if Filter=0)
-2             # Integration Technique (0=Newton-Cotes, 1=Romberg, 2=Adaptive, 3=Quadrature)
+11            # Size of boxcar or SG filter (should be odd)
+3             # Number of passes for the filter (ignored if Filter=0)
+1             # Integration Technique (0=Newton-Cotes, 1=Romberg, 2=Adaptive, 3=Quadrature)
 analysis.txt  # Name of output file

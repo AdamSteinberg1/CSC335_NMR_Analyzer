@@ -81,6 +81,5 @@ void outputResult(std::vector<peak> peaks, configuration config, double shift, d
   //print out to an output text file
   std::ofstream outFile(config.outputFile.c_str());
   outFile << out.str();
-  outFile << "test";
   outFile.close();
 }
