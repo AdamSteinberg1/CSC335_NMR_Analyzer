@@ -1,3 +1,4 @@
+//functions for outputting results to a file and to stdout
 #include "structs.h"
 #include <iostream>
 #include <iomanip>
@@ -32,7 +33,7 @@ std::string printOptions(configuration config, double shift)
   out << std::endl;
   out << "Integration Method" << std::endl;
   out << "===============================" << std::endl;
-  const std::string methods[] = {"Newton-Cotes", "Romberg", "Adaptive Quadrature", "Quadrature"};
+  const std::string methods[] = {"Composite Newton-Cotes", "Romberg", "Adaptive Quadrature", "Gaussian Quadrature"};
   out << methods[config.integrationTechnique] << std::endl << std::endl;
   out << "Plot File Data" << std::endl;
   out << "===============================" << std::endl;
@@ -67,19 +68,11 @@ std::string printPeaks(std::vector<peak> peaks)
 
 void outputResult(std::vector<peak> peaks, configuration config, double shift, double runtime)
 {
-  //a stringstream that will be our formatted result
-  std::stringstream out;
-  out << "                              -=> NMR ANALYSIS <=-" << std::endl << std::endl << std::endl;
-  out << printOptions(config, shift);
-  out << printPeaks(peaks);
-  out << "Analysis took " << runtime << " seconds." << std::endl;
-
-
-  //print out to stdout
-  std::cout << out.str();
-
-  //print out to an output text file
   std::ofstream outFile(config.outputFile.c_str());
-  outFile << out.str();
+  outFile << "                              -=> NMR ANALYSIS <=-" << std::endl << std::endl << std::endl;
+  outFile << printOptions(config, shift);
+  outFile << printPeaks(peaks);
+  outFile << "Analysis took " << runtime << " seconds." << std::endl;
   outFile.close();
+  system(("cat " + config.outputFile).c_str()); //display output to stdout
 }

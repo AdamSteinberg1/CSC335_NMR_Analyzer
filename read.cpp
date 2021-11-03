@@ -5,7 +5,7 @@
 #include <vector>
 #include <limits>
 
-//reads in the configuration file and returns all the options
+//reads in the configuration file and returns all the options in a struct
 configuration readConfig(std::string fileName)
 {
   //data type we're going to return
@@ -36,6 +36,10 @@ configuration readConfig(std::string fileName)
     std::cerr << "Error reading in configuration file " << fileName << std::endl;
     exit(1);
   }
+
+  //a filter size of zero means no filtering
+  if(result.filterSize == 0)
+    result.filterType = 0;
 
   return result;
 }

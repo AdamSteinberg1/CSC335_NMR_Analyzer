@@ -1,3 +1,4 @@
+//class for a cubic spline
 #include "Polynomial.h"
 #include <limits>
 #include <algorithm>

@@ -1,7 +1,5 @@
-//class to represent a polynomial
-//Written by Adam Steinberg
+//implementation of  Polynomial.h
 #include "Polynomial.h"
-
 
 //returns the result of distributing ax^n to this polynomial
 Polynomial Polynomial::distribute(double a, int n) const
@@ -63,7 +61,7 @@ int Polynomial::getDegree() const
 }
 
 //returns the polynomial evaluated at a specific x value
-double Polynomial::evaluate(double x)
+double Polynomial::evaluate(double x) const
 {
   double result = 0;
   for(int i = 0; i <= getDegree(); i++)
@@ -73,7 +71,7 @@ double Polynomial::evaluate(double x)
   return result;
 }
 
-Polynomial Polynomial::derivative()
+Polynomial Polynomial::derivative() const
 {
   //derivative of a constant is 0
   if(getDegree() == 0)
@@ -82,6 +80,8 @@ Polynomial Polynomial::derivative()
   //shift all the coefficients down by a degree
   //the x^0 term is removed because derivative of a constant is 0
   std::vector<double> resultCoefficients(coefficients.begin()+1, coefficients.end());
+  //multiply each coefficient by their previous power
+  //it's the power rule
   for(int i = 0; i < resultCoefficients.size(); i++)
   {
     resultCoefficients[i] *= i+1;
@@ -90,7 +90,7 @@ Polynomial Polynomial::derivative()
 }
 
 //finds a root of the polynomial using Newton's Method with an initial approximation of p0
-double Polynomial::root(double p0)
+double Polynomial::root(double p0) const
 {
   const int MAX_ITERATIONS = 10000;
   const double TOLERANCE = 0.00000000001;
@@ -109,7 +109,8 @@ double Polynomial::root(double p0)
   return p0;
 }
 
-Polynomial Polynomial::power(int n)
+//raises a polynomial to a power
+Polynomial Polynomial::power(int n) const
 {
   if (n == 0)
     return Polynomial({1});
@@ -124,7 +125,7 @@ Polynomial Polynomial::power(int n)
     return (*this) * (this->power(n - 1));
 }
 
-
+//adds two polynomials
 Polynomial operator+(Polynomial a, Polynomial b)
 {
   int resultDegree = std::max(a.getDegree(), b.getDegree());
@@ -142,6 +143,7 @@ Polynomial operator+(Polynomial a, Polynomial b)
   return Polynomial(resultCoefficients);
 }
 
+//multiplies a polynomial by a constant
 Polynomial operator*(double scalar, Polynomial p)
 {
   std::vector<double> resultCoefficients;
@@ -153,6 +155,7 @@ Polynomial operator*(double scalar, Polynomial p)
   return Polynomial(resultCoefficients);
 }
 
+//adds a constant to a polynomial
 Polynomial operator+(double scalar, Polynomial p)
 {
   std::vector<double> resultCoefficients = p.getCoefficients();
@@ -160,6 +163,7 @@ Polynomial operator+(double scalar, Polynomial p)
   return Polynomial(resultCoefficients);
 }
 
+//divides a polynomial by a constant
 Polynomial operator/(Polynomial p, double scalar)
 {
   std::vector<double> resultCoefficients;
@@ -171,11 +175,13 @@ Polynomial operator/(Polynomial p, double scalar)
   return Polynomial(resultCoefficients);
 }
 
+//subtracts two polynomials
 Polynomial operator-(Polynomial a, Polynomial b)
 {
   return a+(-1*b);
 }
 
+//multiplies two polynomials
 Polynomial operator*(Polynomial a, Polynomial b)
 {
   Polynomial result;
@@ -190,6 +196,7 @@ Polynomial operator*(Polynomial a, Polynomial b)
   return result;
 }
 
+//pretty prints a polynomial
 std::ostream& operator<<(std::ostream& os, const Polynomial& p)
 {
   int n = p.getDegree();

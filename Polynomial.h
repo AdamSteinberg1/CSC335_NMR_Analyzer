@@ -1,5 +1,4 @@
 //class to represent a polynomial
-//Written by Adam Steinberg
 #pragma once
 #include <vector>
 #include <cmath>
@@ -8,6 +7,8 @@
 class Polynomial
 {
   private:
+    //the coefficients of each term are stored in order of ascending degree
+    //for example ax^3+bx^2+cx+d is stored as [d,c,b,a]
     std::vector<double> coefficients;
 
     //returns the result of distributing ax^n to this polynomial
@@ -27,12 +28,13 @@ class Polynomial
     int getDegree() const;
 
     //returns the polynomial evaluated at a specific x value
-    double evaluate(double x);
-    Polynomial derivative();
+    double evaluate(double x) const;
+    //returns the derivative of the polynomial
+    Polynomial derivative() const;
 
     //finds a root of the polynomial using Newton's Method with an initial approximation of p0
-    double root(double p0);
-    Polynomial power(int n);
+    double root(double p0) const;
+    Polynomial power(int n) const;
 
     friend Polynomial operator*(Polynomial a, Polynomial b);
 };

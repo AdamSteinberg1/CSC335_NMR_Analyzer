@@ -1,3 +1,6 @@
+//functions for graphing the cubic spline with gnuplot
+//used for debugging
+
 #include "CubicSpline.h"
 #include "structs.h"
 #include <fstream>
@@ -48,12 +51,6 @@ void graph(CubicSpline spline, std::vector<std::pair<double,double>> points)
 
   script  << "set terminal pngcairo\n"
           << "set output 'graph.png'\n"
-          //<< "set xrange [-6:1]\n"
-          //<< "set yrange [-5000:25000]\n"
-          //<< "set xrange [-3.6:-3.3]\n"
-          //<< "set xrange [-2:-1.96]\n"
-          //<< "set yrange [-800:1200]\n"
-          //<< "set yrange [-500:500]\n"
           << "set samples 10000\n"
           << "p(x) = " << gnuPrint(spline) << "\n"
           << "plot p(x) title 'Spline', 0 title 'Baseline', '-' notitle\n";

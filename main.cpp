@@ -4,21 +4,18 @@
 
 int main()
 {
-  auto startTime = std::chrono::high_resolution_clock::now();
-  auto config = readConfig("nmr.in");
-  auto data = readData(config.inputFile);
+  auto startTime = std::chrono::high_resolution_clock::now(); //start timer
+  auto config = readConfig("nmr.in"); //read in "nmr.in"
+  auto data = readData(config.inputFile);   //read in the nmr data
   double shift = 0;
-  data = baselineAdjustment(data, config.baseline, shift);
+  data = baselineAdjustment(data, config.baseline, shift); //shift the data based on TMS and baseline
   data = filter(data, config.filterType, config.filterSize, config.numPasses);
-  CubicSpline spline(data);
-  auto peaks = calculatePeaks(spline, config.integrationTechnique, config.tolerance);
+  CubicSpline spline(data); //construct a cubic spline from the data
+  auto peaks = calculatePeaks(spline, config.integrationTechnique, config.tolerance); //calculate the peak values
 
   auto endTime = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> runtime = endTime - startTime;
+  std::chrono::duration<double> runtime = endTime - startTime; //calculate elapsed time
 
   outputResult(peaks, config, shift, runtime.count());
-
-  graph(spline, data);
-
   return 0;
 }

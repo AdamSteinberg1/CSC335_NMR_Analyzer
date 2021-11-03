@@ -1,7 +1,7 @@
 CXX = g++
 LDLIBS =  -larmadillo -lgsl
 
-OBJS = Polynomial.o CubicSpline.o filters.o read.o baselineAdjustment.o peaks.o output.o graph.o
+OBJS = Polynomial.o CubicSpline.o filters.o read.o baselineAdjustment.o peaks.o output.o # graph.o
 HEADERS = Polynomial.h CubicSpline.h prototypes.h structs.h legendreConstants.h
 
 
@@ -32,8 +32,8 @@ peaks.o : peaks.cpp $(HEADERS)
 output.o : output.cpp $(HEADERS)
 	$(CXX) output.cpp -c
 
-graph.o : graph.cpp $(HEADERS)
-	$(CXX) graph.cpp -c
+#graph.o : graph.cpp $(HEADERS)
+#	$(CXX) graph.cpp -c
 
 clean:
 	rm *.o

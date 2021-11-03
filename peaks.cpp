@@ -1,4 +1,6 @@
-#include "structs.h"
+//functions to calculate the peaks of the cubic spline
+//finds their start and endpoints, their area, and their location
+#include "structs.h" //peak struct is included here
 #include "CubicSpline.h"
 #include "legendreConstants.h"
 #include <vector>
@@ -7,7 +9,7 @@
 #include <cmath>
 #include <gsl/gsl_poly.h>
 
-#define MAX_ITERATIONS 10000
+#define MAX_ITERATIONS 1000
 #define MAX_RECURSION_DEPTH 30
 
 //finds all the x values on the interval (a,b] where p(x) = 0
@@ -58,18 +60,23 @@ std::vector<double> findRoots(CubicSpline spline)
   return roots;
 }
 
-//integrates f from a to b using Newton-Cotes
-double newtonCotes(std::function<double(double)> f, double a, double b)
+//integrates f from a to b using composite Newton-Cotes
+//performs n subdivisions. n must be even
+double newtonCotes(std::function<double(double)> f, double a, double b, int n)
 {
-  //uses closed Newton-Cotes with n=4
-  double h = (b-a)/4;
-  double x0 = a;
-  double x1 = a+h;
-  double x2 = x1+h;
-  double x3 = x2+h;
-  double x4 = b;
-
-  return (2*h/45)*(7*f(x0) + 32*f(x1) + 12*f(x2) + 32*f(x3) + 7*f(x4));
+  //uses composite Newton-Cotes with Simpson's rule
+  double h = (b-a)/n;
+  double sum1 = 0;
+  double sum2 = 0;
+  for(int i = 1; i < n; i++)
+  {
+    double x = a + i*h;
+    if(i%2==0)
+      sum2 += f(x);
+    else
+      sum1 += f(x);
+  }
+  return h * (f(a) + 2*sum2 + 4*sum1 + f(b))/3;
 }
 
 //performs Romberg integration over f from a to b
@@ -85,12 +92,12 @@ double romberg(std::function<double(double)> f, double a, double b, double toler
     currRow.clear();
     double sum = 0;
     for(int k = 1; k <= pow(2,i-2); k++)
-      sum += f(a+(k-0.5)*h);
+      sum += f(a+(k-0.5)*h); //calculate value in first column of the extrapolation table
     currRow.push_back(0.5*(lastRow[0] + h*sum));
     for(int j = 1; j < i; j++)
-      currRow.push_back(currRow[j-1] + (currRow[j-1]-lastRow[j-1])/(pow(4,j)-1));
-    h *= 0.5;
-    if(fabs(currRow.back() - lastRow.back()) < tolerance)
+      currRow.push_back(currRow[j-1] + (currRow[j-1]-lastRow[j-1])/(pow(4,j)-1)); //perform Richardson extrapolation
+    h *= 0.5; //h halves for each row in the table
+    if(fabs(currRow.back() - lastRow.back()) < tolerance) //estimate error and compare to tolerance
     {
       return currRow.back();
     }
@@ -113,6 +120,7 @@ double adaptiveQuadHelper(std::function<double(double)> f, double a, double b, d
       return whole;
     double f_left_mid = f(left_mid);
     double f_right_mid = f(right_mid);
+    //simpson's method
     double left  = (h/6) * (f_a + 4*f_left_mid + f_mid);
     double right = (h/6) * (f_mid + 4*f_right_mid + f_b);
     double diff = whole - left - right;
@@ -157,8 +165,8 @@ double integrate(double a, double b, CubicSpline spline, int integrationTechniqu
   auto f = [&](double x) { return spline.evaluate(x); };  //lambda for evaluating the spline
   switch (integrationTechnique)
   {
-    case 0: //Newton-Cotes
-      return newtonCotes(f, a, b);
+    case 0: //Composite Newton-Cotes with 20 subintervals
+      return newtonCotes(f, a, b, 20);
       break;
     case 1: //Romberg
       return romberg(f, a, b, tolerance);
@@ -166,7 +174,7 @@ double integrate(double a, double b, CubicSpline spline, int integrationTechniqu
     case 2: //Adaptive
       return adaptiveQuad(f, a, b, tolerance);
       break;
-    case 3: //Quadrature
+    case 3: //Gaussian Quadrature
       return gaussQuad(f, a, b);
       break;
     default:
@@ -176,6 +184,8 @@ double integrate(double a, double b, CubicSpline spline, int integrationTechniqu
   }
 }
 
+//calculate a vector of peak structs
+//finds start and endpoints, area, and location
 std::vector<peak> calculatePeaks(CubicSpline spline, int integrationTechnique, double tolerance)
 {
   //find all the points that the cubic spline intersects the x-axis
@@ -206,7 +216,6 @@ std::vector<peak> calculatePeaks(CubicSpline spline, int integrationTechnique, d
   {
     p.numHydrogens = int(std::round(p.area/minArea));
   }
-
 
   return peaks;
 }

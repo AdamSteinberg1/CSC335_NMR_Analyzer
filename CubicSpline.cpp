@@ -1,3 +1,4 @@
+//implementation of CubicSpline.h
 #include "CubicSpline.h"
 
 //constructs a natural cubic spline from points

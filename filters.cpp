@@ -1,3 +1,4 @@
+//functions for filtering the data
 #include <vector>
 #include <utility>
 #include <iostream>
@@ -13,11 +14,12 @@ std::vector<std::pair<double, double>> boxcarFilter(std::vector<std::pair<double
     int startIndex = i - (filterSize-1)/2;
     int endIndex = i + (filterSize-1)/2;
     double sum = 0;
+    std::vector<double> boxcar;
     for(int j = startIndex; j <= endIndex; j++)
     {
-      sum += data[(j+n)%n].second;
+      sum += data[(j+n)%n].second / filterSize;
     }
-    result.push_back({data[i].first, sum/filterSize});
+    result.push_back({data[i].first, sum});
   }
   return result;
 }
@@ -32,7 +34,9 @@ std::vector<std::pair<double, double>> boxcarFilter(std::vector<std::pair<double
   }
 
   for(int i = 0; i < numPasses; i++)
+  {
     data = boxcarFilter(data, filterSize);
+  }
 
   return data;
 }
@@ -96,7 +100,8 @@ std::vector<std::pair<double, double>> savitzkyGolayFilter(std::vector<std::pair
 //filters the data according to the options specified
 std::vector<std::pair<double, double>> filter(std::vector<std::pair<double, double>> data, int filterType, int filterSize, int numPasses)
 {
-  if(filterSize % 2 == 0)
+
+  if(filterType != 0 && filterSize % 2 == 0)
   {
     std::cerr << "Error: filter size must be odd." << std::endl;
     exit(1);
