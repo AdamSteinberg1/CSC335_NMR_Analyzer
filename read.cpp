@@ -38,7 +38,7 @@ configuration readConfig(std::string fileName)
   }
 
   //a filter size of zero means no filtering
-  if(result.filterSize == 0)
+  if(result.filterSize == 0 &&  result.filterType != 3)
     result.filterType = 0;
 
   return result;

@@ -2,6 +2,7 @@
 #include <vector>
 #include <utility>
 #include <iostream>
+#include "prototypes.h"
 
 //applies a boxcar filter to data
 std::vector<std::pair<double, double>> boxcarFilter(std::vector<std::pair<double, double>> data, int filterSize)
@@ -101,7 +102,7 @@ std::vector<std::pair<double, double>> savitzkyGolayFilter(std::vector<std::pair
 std::vector<std::pair<double, double>> filter(std::vector<std::pair<double, double>> data, int filterType, int filterSize, int numPasses)
 {
 
-  if(filterType != 0 && filterSize % 2 == 0)
+  if(filterType != 0 && filterType != 3 && filterSize % 2 == 0)
   {
     std::cerr << "Error: filter size must be odd." << std::endl;
     exit(1);
@@ -115,6 +116,8 @@ std::vector<std::pair<double, double>> filter(std::vector<std::pair<double, doub
       return boxcarFilter(data, filterSize, numPasses);
     case 2: //Savitzky-Golay
       return savitzkyGolayFilter(data, filterSize, numPasses);
+    case 3: //Discrete Fourier Transform filter
+      return dftFilter(data, filterSize);
     default:
       std::cerr << "Error: filter type " << filterType << " is not valid." << std::endl;
       exit(1);

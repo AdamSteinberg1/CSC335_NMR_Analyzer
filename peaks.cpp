@@ -165,14 +165,14 @@ double integrate(double a, double b, CubicSpline spline, int integrationTechniqu
   auto f = [&](double x) { return spline.evaluate(x); };  //lambda for evaluating the spline
   switch (integrationTechnique)
   {
-    case 0: //Composite Newton-Cotes with 20 subintervals
-      return newtonCotes(f, a, b, 20);
+    case 0: //Adaptive
+      return adaptiveQuad(f, a, b, tolerance);
       break;
     case 1: //Romberg
       return romberg(f, a, b, tolerance);
       break;
-    case 2: //Adaptive
-      return adaptiveQuad(f, a, b, tolerance);
+    case 2: //Composite Newton-Cotes with 20 subintervals
+      return newtonCotes(f, a, b, 20);
       break;
     case 3: //Gaussian Quadrature
       return gaussQuad(f, a, b);

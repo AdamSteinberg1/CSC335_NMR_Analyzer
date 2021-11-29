@@ -1,4 +1,4 @@
-# CSC335 Project 1
+# CSC335 Project 1 and 2
 
 ### Compile and Run Instructions
 Compile the project with

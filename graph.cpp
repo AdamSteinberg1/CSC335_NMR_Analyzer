@@ -1,12 +1,13 @@
 //functions for graphing the cubic spline with gnuplot
 //used for debugging
-
 #include "CubicSpline.h"
 #include "structs.h"
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <limits>
+
+int count = 1;
 
 std::string gnuPrint(Polynomial p)
 {
@@ -44,13 +45,30 @@ std::string gnuPrint(CubicSpline c)
   return result.str();
 }
 
+void graph(std::vector<std::pair<double,double>> points)
+{
+  std::ofstream script("tmp.plt");
+
+  script  << "set terminal pngcairo\n"
+          << "set output 'graph" << count++ << ".png'\n"
+          << "set samples 10000\n"
+          << "plot 0 title 'Baseline', '-' notitle\n";
+
+  for(auto & point: points)
+  {
+    script << point.first << '\t' <<point.second << std::endl;
+  }
+
+  system("gnuplot tmp.plt");
+  system("rm tmp.plt");
+}
 
 void graph(CubicSpline spline, std::vector<std::pair<double,double>> points)
 {
   std::ofstream script("tmp.plt");
 
   script  << "set terminal pngcairo\n"
-          << "set output 'graph.png'\n"
+          << "set output 'graph" << count++ << ".png'\n"
           << "set samples 10000\n"
           << "p(x) = " << gnuPrint(spline) << "\n"
           << "plot p(x) title 'Spline', 0 title 'Baseline', '-' notitle\n";
