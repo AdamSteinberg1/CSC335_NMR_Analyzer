@@ -10,7 +10,7 @@
 #include <gsl/gsl_poly.h>
 
 #define MAX_ITERATIONS 1000
-#define MAX_RECURSION_DEPTH 30
+#define MAX_RECURSION_DEPTH 10
 
 //finds all the x values on the interval (a,b] where p(x) = 0
 //p is assumed to be a cubic polynomial
@@ -108,7 +108,7 @@ double romberg(std::function<double(double)> f, double a, double b, double toler
 
 //recursively find the integral from a to b with simpson's method
 //tolerance is halved at each recursive level
-double adaptiveQuadHelper(std::function<double(double)> f, double a, double b, double tol, double whole, double f_a, double f_b, double f_mid, int recDepth) {
+double adaptiveQuadhelper(std::function<double(double)> f, double a, double b, double tol, double whole, double f_a, double f_b, double f_mid, int recDepth) {
     double mid = (a + b)/2;
     double h = (b - a)/2;
     double left_mid  = (a + mid)/2;
@@ -127,8 +127,8 @@ double adaptiveQuadHelper(std::function<double(double)> f, double a, double b, d
 
     if (recDepth <= 0 || fabs(diff) <= 10*tol) //10*tolerance is used because that's what is used in the Burden text
         return left + right;
-    return adaptiveQuadHelper(f, a, mid, tol/2, left,  f_a, f_mid, f_left_mid, recDepth-1) +
-           adaptiveQuadHelper(f, mid, b, tol/2, right, f_mid, f_b, f_right_mid, recDepth-1);
+    return adaptiveQuadhelper(f, a, mid, tol/2, left,  f_a, f_mid, f_left_mid, recDepth-1) +
+           adaptiveQuadhelper(f, mid, b, tol/2, right, f_mid, f_b, f_right_mid, recDepth-1);
 }
 
 //integrates from a to b until error is less than tolerance
@@ -142,7 +142,7 @@ double adaptiveQuad(std::function<double(double)> f, double a, double b, double 
     double f_b = f(b);
     double f_m = f((a + b)/2);
     double simpsons = (h/6)*(f_a + 4*f_m + f_b);
-    return adaptiveQuadHelper(f, a, b, tolerance, simpsons, f_a, f_b, f_m, MAX_RECURSION_DEPTH);
+    return adaptiveQuadhelper(f, a, b, tolerance, simpsons, f_a, f_b, f_m, MAX_RECURSION_DEPTH);
 }
 
 //integrates f from a to b using Gaussian Quadrature with n=512

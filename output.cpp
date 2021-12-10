@@ -29,11 +29,14 @@ std::string printOptions(configuration config, double shift)
       out << "SG Filter Size\t\t:\t" << config.filterSize << std::endl;
       out << "SG Filter Passes\t:\t" << config.numPasses << std::endl;
       break;
+    case 3:
+      out << "Discrete Fourier Transform Filtering" << std::endl;
+      out << "Method of DFT recovery\t:\tinverse" << std::endl;
   }
   out << std::endl;
   out << "Integration Method" << std::endl;
   out << "===============================" << std::endl;
-  const std::string methods[] = {"Composite Newton-Cotes", "Romberg", "Adaptive Quadrature", "Gaussian Quadrature"};
+  const std::string methods[] = {"Adaptive Quadrature", "Romberg", "Composite Newton-Cotes", "Gaussian Quadrature"};
   out << methods[config.integrationTechnique] << std::endl << std::endl;
   out << "Plot File Data" << std::endl;
   out << "===============================" << std::endl;

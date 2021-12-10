@@ -1,7 +1,6 @@
 //functions for filtering the data
 #include <vector>
 #include <utility>
-#include <iostream>
 #include "prototypes.h"
 
 //applies a boxcar filter to data
@@ -117,7 +116,7 @@ std::vector<std::pair<double, double>> filter(std::vector<std::pair<double, doub
     case 2: //Savitzky-Golay
       return savitzkyGolayFilter(data, filterSize, numPasses);
     case 3: //Discrete Fourier Transform filter
-      return dftFilter(data, filterSize);
+      return dftFilter(data);
     default:
       std::cerr << "Error: filter type " << filterType << " is not valid." << std::endl;
       exit(1);
